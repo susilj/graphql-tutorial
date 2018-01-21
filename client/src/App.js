@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
 import ApolloClient from 'apollo-client';
+import { HttpLink } from 'apollo-link-http';
+import { InMemoryCache } from 'apollo-cache-inmemory';
 import { graphql, ApolloProvider } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import logo from './logo.svg';
 import './App.css';
 
-const client = new ApolloClient();
+const client = new ApolloClient({
+  link: new HttpLink({ uri: 'https://graphql.example.com' }),
+  cache: new InMemoryCache()
+});
 
 const ChannelsList = ({ data: { loading, error, channels } }) => {
   if (loading) {
