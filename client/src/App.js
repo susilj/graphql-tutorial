@@ -1,16 +1,31 @@
 import React, { Component } from 'react';
-import ApolloClient from 'apollo-client';
-import { HttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import ApolloClient from 'apollo-client-preset';
+// import { HttpLink } from 'apollo-link-http';
+// import { InMemoryCache } from 'apollo-cache-inmemory';
 import { graphql, ApolloProvider } from 'react-apollo';
 import gql from 'graphql-tag';
+import {
+  makeExecutableSchema,
+  addMockFunctionsToSchema
+} from 'graphql-tools';
+import { mockNetworkInterfaceWithSchema } from 'apollo-test-utils';
+
+import { typeDefs } from './schema';
 
 import logo from './logo.svg';
 import './App.css';
 
+const schema = makeExecutableSchema({ typeDefs });
+
+addMockFunctionsToSchema({ schema });
+
+const mockNetworkInterface = mockNetworkInterfaceWithSchema({ schema });
+
 const client = new ApolloClient({
-  link: new HttpLink({ uri: 'https://graphql.example.com' }),
-  cache: new InMemoryCache()
+  // link: new HttpLink({ uri: 'https://graphql.example.com' }),
+  // cache: new InMemoryCache()
+  // ,
+  networkInterface: mockNetworkInterface
 });
 
 const ChannelsList = ({ data: { loading, error, channels } }) => {
