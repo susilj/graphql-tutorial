@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import ApolloClient from 'apollo-client-preset';
-// import { HttpLink } from 'apollo-link-http';
-// import { InMemoryCache } from 'apollo-cache-inmemory';
-import { graphql, ApolloProvider } from 'react-apollo';
-import gql from 'graphql-tag';
+// import { createNetworkInterface } from 'apollo-client';
+import { HttpLink } from 'apollo-link-http';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import {
+  ApolloProvider,
+  // createNetworkInterface
+} from 'react-apollo';
 import {
   makeExecutableSchema,
   addMockFunctionsToSchema
@@ -11,34 +14,38 @@ import {
 import { mockNetworkInterfaceWithSchema } from 'apollo-test-utils';
 
 import { typeDefs } from './schema';
-
 import logo from './logo.svg';
 import './App.css';
+import ChannelsListWithData from './components/ChannelsListWithData';
 
 const schema = makeExecutableSchema({ typeDefs });
 
 addMockFunctionsToSchema({ schema });
 
 const mockNetworkInterface = mockNetworkInterfaceWithSchema({ schema });
+// const networkInterface = createNetworkInterface({ 
+//   uri: 'http://localhost:4000/graphql',
+// });
 
 const client = new ApolloClient({
-  // link: new HttpLink({ uri: 'https://graphql.example.com' }),
-  // cache: new InMemoryCache()
+  link: new HttpLink({ uri: 'http://localhost:4000/graphql' }),
+  cache: new InMemoryCache()
   // ,
-  networkInterface: mockNetworkInterface
+  // networkInterface: mockNetworkInterface
+  // networkInterface
 });
 
-const ChannelsList = ({ data: { loading, error, channels } }) => {
-  if (loading) {
-    return <p>Loading ...</p>;
-  }
-  if (error) {
-    return <p>{error.message}</p>;
-  }
-  return <ul>
-    {channels.map(ch => <li key={ch.id}>{ch.name}</li>)}
-  </ul>;
-}
+// const ChannelsList = ({ data: { loading, error, channels } }) => {
+//   if (loading) {
+//     return <p>Loading ...</p>;
+//   }
+//   if (error) {
+//     return <p>{error.message}</p>;
+//   }
+//   return <ul>
+//     {channels.map(ch => <li key={ch.id}>{ch.name}</li>)}
+//   </ul>;
+// }
 // (
 //   <ul className="Item-list">
 //     <li>Channel 1</li>
@@ -46,16 +53,16 @@ const ChannelsList = ({ data: { loading, error, channels } }) => {
 //   </ul>
 // );
 
-const channelsListQuery = gql`
-   query ChannelsListQuery {
-     channels {
-       id
-       name
-     }
-   }
- `;
+// const channelsListQuery = gql`
+//    query ChannelsListQuery {
+//      channels {
+//        id
+//        name
+//      }
+//    }
+//  `;
 
-const ChannelsListWithData = graphql(channelsListQuery)(ChannelsList);
+// const ChannelsListWithData = graphql(channelsListQuery)(ChannelsList);
 
 class App extends Component {
   render() {
