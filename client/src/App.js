@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import ApolloClient from 'apollo-client-preset';
 // import { createNetworkInterface } from 'apollo-client';
-import { HttpLink } from 'apollo-link-http';
+import { HttpLink, createHttpLink } from 'apollo-link-http';
+import { ApolloLink, concat, Observable } from 'apollo-link';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import {
   ApolloProvider,
@@ -27,8 +28,27 @@ const mockNetworkInterface = mockNetworkInterfaceWithSchema({ schema });
 //   uri: 'http://localhost:4000/graphql',
 // });
 
+const httpLink = createHttpLink({ uri: 'http://localhost:4000/graphql' });
+
+function test(operation, forward) {
+  return forward(operation)
+}
+const authMiddleware = new ApolloLink((operation, forward) => {
+  console.log(operation.operationName);
+  return forward(operation);
+  // return new Observable(obs => {
+  //   setTimeout(() => {
+  //     console.log(obs);
+  //     // obs.next({ data: { foo: { id: 1 } } });
+  //     obs.next({});
+  //     obs.complete();
+  //   }, 5);
+  // });
+})
+
 const client = new ApolloClient({
-  link: new HttpLink({ uri: 'http://localhost:4000/graphql' }),
+  // link: new HttpLink({ uri: 'http://localhost:4000/graphql' }),
+  link: authMiddleware.concat(httpLink),
   cache: new InMemoryCache()
   // ,
   // networkInterface: mockNetworkInterface
