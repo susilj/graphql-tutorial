@@ -18,7 +18,6 @@ const AddChannel = ({ mutate }) => {
         },
         // refetchQueries: [ { query: channelsListQuery }]
         update: (store, { data: { addChannel } }) => {
-          console.log(addChannel, data);
           // Read the data from the cache for this query.
           const data = store.readQuery({ query: channelsListQuery });
           // Add our channel from the mutation to the end.
