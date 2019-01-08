@@ -13,6 +13,7 @@ import {
 } from 'apollo-link-http';
 import {
   ApolloLink,
+  split,
   // concat,
   // Observable
 } from 'apollo-link';
@@ -27,6 +28,8 @@ import {
   addMockFunctionsToSchema
 } from 'graphql-tools';
 // import { mockNetworkInterfaceWithSchema } from 'apollo-test-utils';
+import { SubscriptionClient, addGraphQLSubscriptions } from 'subscriptions-transport-ws';
+import { getMainDefinition } from 'apollo-utilities';
 
 import { typeDefs } from './schema';
 // import logo from './logo.svg';
@@ -55,6 +58,10 @@ function dataIdFromObject(result) {
   return null;
 }
 
+const wsClient = new SubscriptionClient(`ws://localhost:4000/subscriptions`, {
+  reconnect: true,
+});
+
 // function test(operation, forward) {
 //   return forward(operation)
 // }
@@ -72,9 +79,20 @@ const authMiddleware = new ApolloLink((operation, forward) => {
   // });
 })
 
+const link = split(
+  // split based on operation type
+  ({ query }) => {
+    const { kind, operation } = getMainDefinition(query);
+    return kind === 'OperationDefinition' && operation === 'subscription';
+  },
+  wsClient,
+  httpLink,
+);
+
 const client = new ApolloClient({
   // link: new HttpLink({ uri: 'http://localhost:4000/graphql' }),
-  link: authMiddleware.concat(httpLink),
+  //link: authMiddleware.concat(httpLink),
+  link: authMiddleware.concat(link),
   cache: new InMemoryCache(),
   customResolvers: {
     Query: {

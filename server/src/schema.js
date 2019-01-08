@@ -10,6 +10,8 @@ const typeDefs = `
      id: ID!                # "!" denotes a required field
      name: String
      messages: [Message]!
+     # messages will be returned in a MessageFeed object wrapper
+     messageFeed(cursor: String): MessageFeed  
   }
 
   input MessageInput{
@@ -20,8 +22,17 @@ const typeDefs = `
   type Message {
     id: ID!
     text: String
+    createdAt: Int
   }
 
+  type MessageFeed {
+    # cursor specifies the place in the list where we left off
+    cursor: String!
+    
+    # this is a chunk of messages to be returned
+    messages: [Message]!
+  }
+  
   # This type specifies the entry points into our API. In this case
   # there is only one - "channels" - which returns a list of channels.
   type Query {
